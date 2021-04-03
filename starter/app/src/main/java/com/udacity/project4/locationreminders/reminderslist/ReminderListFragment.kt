@@ -71,6 +71,7 @@ class ReminderListFragment : BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.logout -> {
+                //TODO MERVE Logout flow
 //                TODO: add the logout implementation
             }
         }
