@@ -23,5 +23,21 @@
             tools:context=".MapsActivity" />
 
 
+        <TextView
+            android:id="@+id/save_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:background="@color/colorAccent"
+            android:padding="@dimen/text_padding"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/button_text_size"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/save" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

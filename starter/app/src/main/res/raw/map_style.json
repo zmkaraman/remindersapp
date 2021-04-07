@@ -51,6 +51,18 @@
     ]
   },
   {
+    "featureType": "administrative.neighborhood",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "color": "#7e206a"
+      },
+      {
+        "visibility": "simplified"
+      }
+    ]
+  },
+  {
     "featureType": "landscape.natural",
     "elementType": "geometry",
     "stylers": [
@@ -78,11 +90,28 @@
     ]
   },
   {
+    "featureType": "poi.business",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
     "featureType": "poi.park",
     "elementType": "geometry.fill",
     "stylers": [
       {
         "color": "#a5b076"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
       }
     ]
   },
@@ -109,7 +138,10 @@
     "elementType": "geometry.fill",
     "stylers": [
       {
-        "color": "#b706b1"
+        "color": "#d694c8"
+      },
+      {
+        "weight": 3.5
       }
     ]
   },

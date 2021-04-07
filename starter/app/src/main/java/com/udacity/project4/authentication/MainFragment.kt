@@ -1,4 +1,4 @@
-package com.udacity.project4.login
+package com.udacity.project4.authentication
 
 import android.app.Activity
 import android.content.Intent
@@ -61,7 +61,7 @@ class MainFragment : Fragment() {
                 .createSignInIntentBuilder()
                 .setAvailableProviders(providers)
                 .build(),
-            MainFragment.SIGN_IN_REQUEST_CODE
+                SIGN_IN_REQUEST_CODE
         )
     }
 
@@ -86,24 +86,15 @@ class MainFragment : Fragment() {
         viewModel.authenticationState.observe(viewLifecycleOwner, Observer { authenticationState ->
             when (authenticationState) {
                 LoginViewModel.AuthenticationState.AUTHENTICATED -> {
-                    binding.authButton.text = getString(R.string.logout)
-                    binding.authButton.setOnClickListener {
-                        AuthUI.getInstance().signOut(requireContext())
-                    }
-
-                    //binding.welcomeText.text = getFactWithPersonalization(factToDisplay)
-                    //remindersa yönlenmeli
                     val action = MainFragmentDirections.actionMainFragmentToReminderListFragment()
                     findNavController().navigate(action)
                 }
                 else -> {
-
                     // TODO 3. Lastly, if there is no logged-in user,
                     // auth_button should display Login and
                     //  launch the sign in screen when clicked.
-                    binding.authButton.text = getString(R.string.login)
-                    binding.authButton.setOnClickListener { launchSignInFlow() }
-                    //binding.welcomeText.text = factToDisplay
+                    //binding.authButton.text = getString(R.string.login)
+                    //binding.authButton.setOnClickListener { launchSignInFlow() }
                 }
             }
         })

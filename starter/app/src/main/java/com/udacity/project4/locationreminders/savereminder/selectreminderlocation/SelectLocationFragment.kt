@@ -2,12 +2,8 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
-import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -20,10 +16,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
@@ -36,8 +29,11 @@ import java.util.*
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
+    private var marker: Marker? = null
     private val TAG = SelectLocationFragment::class.java.simpleName
     private lateinit var map: GoogleMap
+    private lateinit var latLang: LatLng
+
 
     //Use Koin to get the view model of the SaveReminder
     override val _viewModel: SaveReminderViewModel by inject()
@@ -66,11 +62,23 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         return binding.root
     }
 
-    private fun onLocationSelected(latLng: LatLng) {
-        Toast.makeText(activity, "Lat Long $latLng", Toast.LENGTH_SHORT).show()
-        _viewModel.latitude.value = latLng.latitude
-        _viewModel.longitude.value = latLng.longitude
-        _viewModel.reminderSelectedLocationStr.value = "TODO MERVE fixlenecek"
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.saveLocation.setOnClickListener {
+
+            if (marker == null) {
+                Toast.makeText(activity, "Please select a location", Toast.LENGTH_SHORT).show()
+            } else{
+                onLocationSelected()
+            }
+        }
+    }
+
+    private fun onLocationSelected() {
+        _viewModel.latitude.value = marker?.position?.latitude
+        _viewModel.longitude.value = marker?.position?.longitude
+        _viewModel.reminderSelectedLocationStr.value = marker?.title
         _viewModel.navigationCommand.postValue(NavigationCommand.Back)
     }
 
@@ -103,6 +111,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         map = googleMap
 
         //These coordinates represent the latitude and longitude of the Googleplex.
+        //TODO Merve vakit kalırsa user location
         val latitude = 37.422160
         val longitude = -122.084270
 
@@ -110,11 +119,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         val homeLatLng = LatLng(latitude, longitude)
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(homeLatLng, zoomLevel))
-        map.addMarker(MarkerOptions().position(homeLatLng))
 
-        //TODO Merve vakit kalırsa style degistir
         setMapStyle(map)
         setMapClick(map)
+
         enableMyLocation()
     }
 
@@ -162,22 +170,25 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         map.setOnMapClickListener { latLng ->
 
+            latLang = latLng
             val snippet = String.format(
                     Locale.getDefault(),
                     "Lat: %1$.5f, Long: %2$.5f",
                     latLng.latitude,
                     latLng.longitude
             )
-            map.addMarker(
+
+            //removeprevious marker
+            marker?.remove()
+
+            marker = map.addMarker(
                     MarkerOptions()
                             .position(latLng)
-                            .title(getString(R.string.dropped_pin))
+                            .title(snippet)
                             .snippet(snippet)
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
 
             )
 
-            onLocationSelected(latLng)
         }
     }
 

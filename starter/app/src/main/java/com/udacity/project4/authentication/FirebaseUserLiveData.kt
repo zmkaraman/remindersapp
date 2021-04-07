@@ -1,4 +1,4 @@
-package com.udacity.project4.login
+package com.udacity.project4.authentication
 
 
 import com.google.firebase.auth.FirebaseUser

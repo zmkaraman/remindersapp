@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.udacity.project4.login.MainFragment"
+        android:name="com.udacity.project4.authentication.MainFragment"
         android:label="MainFragment">
         <action
             android:id="@+id/action_mainFragment_to_reminderListFragment"
@@ -20,6 +20,10 @@
         <action
             android:id="@+id/to_save_reminder"
             app:destination="@id/saveReminderFragment" />
+        <action
+            android:id="@+id/to_main"
+            app:destination="@id/mainFragment" />
+
     </fragment>
 
     <fragment

@@ -16,7 +16,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
         android:name=".MyApp"
@@ -26,7 +26,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".login.MainActivity">
+        <activity android:name=".authentication.AuthenticationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -45,8 +45,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".authentication.AuthenticationActivity">
-        </activity>
         <activity android:name=".locationreminders.RemindersActivity" >
         </activity>
         <receiver
