@@ -5,22 +5,18 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.udacity.project4.BuildConfig
 import com.udacity.project4.R
 import com.udacity.project4.locationreminders.ReminderDescriptionActivity
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
+import java.lang.Exception
 
 private const val NOTIFICATION_CHANNEL_ID = BuildConfig.APPLICATION_ID + ".channel"
 
-
-/*
- * A Kotlin extension function for AndroidX's NotificationCompat that sends our Geofence
- * entered notification.  It sends a custom notification based on the name string associated
- * with the LANDMARK_DATA from GeofencingConstatns in the GeofenceUtils file.
- */
-fun NotificationManager.sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
+fun sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
     val notificationManager = context
         .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -40,17 +36,18 @@ fun NotificationManager.sendNotification(context: Context, reminderDataItem: Rem
     val intent = ReminderDescriptionActivity.newIntent(context.applicationContext, reminderDataItem)
 
     //create a pending intent that opens ReminderDescriptionActivity when the user clicks on the notification
-/*   val stackBuilder = TaskStackBuilder.create(context)
+    val stackBuilder = TaskStackBuilder.create(context)
         .addParentStack(ReminderDescriptionActivity::class.java)
         .addNextIntent(intent)
     val notificationPendingIntent = stackBuilder
-        .getPendingIntent(getUniqueId(), PendingIntent.FLAG_UPDATE_CURRENT)*/
+        .getPendingIntent(getUniqueId(), PendingIntent.FLAG_UPDATE_CURRENT)
 
 //    build the notification object with the data to be shown
     val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
         .setSmallIcon(R.mipmap.ic_launcher)
         .setContentTitle(reminderDataItem.title)
-        .setContentText(reminderDataItem.location)//.setContentIntent(notificationPendingIntent)
+        .setContentText(reminderDataItem.location)//
+        .setContentIntent(notificationPendingIntent)
         .setAutoCancel(true)
         .build()
 
@@ -58,3 +55,5 @@ fun NotificationManager.sendNotification(context: Context, reminderDataItem: Rem
 }
 
 private fun getUniqueId() = ((System.currentTimeMillis() % 10000).toInt())
+
+private const val TAG = "NotificationUtils"
