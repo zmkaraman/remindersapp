@@ -2,10 +2,13 @@ package com.udacity.project4.locationreminders.data
 
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.dto.Result
+import kotlinx.coroutines.runBlocking
+import java.util.LinkedHashMap
 
 //Use FakeDataSource that acts as a test double to the LocalDataSource
 class FakeDataSource(var reminders: MutableList<ReminderDTO>? = mutableListOf() )  : ReminderDataSource {
 
+    var reminderServiceData: LinkedHashMap<String, ReminderDTO> = LinkedHashMap()
 
     override suspend fun getReminders(): Result<List<ReminderDTO>> {
         reminders?.let { return Result.Success(ArrayList(it)) }
@@ -25,5 +28,12 @@ class FakeDataSource(var reminders: MutableList<ReminderDTO>? = mutableListOf() 
         reminders?.clear()
     }
 
+
+    fun addReminders(vararg reminders: ReminderDTO) {
+        for (reminder in reminders) {
+            reminderServiceData[reminder.id] = reminder
+        }
+        runBlocking { getReminders() }
+    }
 
 }
