@@ -5,6 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.udacity.project4.R
+import com.udacity.project4.locationreminders.MainCoroutineRule
 import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.getOrAwaitValue
@@ -21,6 +22,11 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @ExperimentalCoroutinesApi
 class RemindersListViewModelTest {
+
+    // Set the main coroutines dispatcher for unit testing.
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -46,59 +52,55 @@ class RemindersListViewModelTest {
 
         // Then the new task event is triggered
         val value = reminderListViewModel.showNoData.getOrAwaitValue()
-
         // Then the new task event is triggered
         Assert.assertThat(value, Is.`is`(true))
     }
 
 
+    @ExperimentalCoroutinesApi
     @Test
-    fun loadRemindersDataExist_showNoDataFalse() {
+    fun loadRemindersDataExist_showLoadingTrue() = mainCoroutineRule.runBlockingTest {
 
-        // We initialise the tasks to 3, with one active and two completed
-        var reminders: MutableList<ReminderDTO>? = mutableListOf()
-        reminders?.add(ReminderDTO("Reminder1", "Description1",null,null,null))
-        reminders?.add(ReminderDTO("Reminder2", "Description3",null,null,null))
-        datasource = FakeDataSource(reminders)
+        mainCoroutineRule.pauseDispatcher()
+        datasource = FakeDataSource()
+        datasource.addReminders(ReminderDTO("Reminder1", "Description1","12321312",null,null))
 
         reminderListViewModel = RemindersListViewModel(ApplicationProvider.getApplicationContext(), datasource)
 
         // Given a fresh TasksViewModel
         reminderListViewModel.loadReminders()
+
+        // Then the new task event is triggered
+        val valueTrue = reminderListViewModel.showLoading.getOrAwaitValue()
+        Assert.assertThat(valueTrue, Is.`is`(true))
+
+        mainCoroutineRule.resumeDispatcher()
+
+        // Then the new task event is triggered
+        val valueFalse = reminderListViewModel.showLoading.getOrAwaitValue()
+        Assert.assertThat(valueFalse, Is.`is`(false))
+
 
         // Then the new task event is triggered
         val value = reminderListViewModel.showNoData.getOrAwaitValue()
-
         // Then the new task event is triggered
-        Assert.assertThat(value, Is.`is`(false))
+        Assert.assertThat(value, Is.`is`(true))
     }
 
-    @ExperimentalCoroutinesApi
     @Test
-    fun loadRemindersDataExist_showLoadingFalse() = runBlockingTest {
+    fun loadRemindersError_showTestException() {
 
-        // We initialise the tasks to 3, with one active and two completed
-        var reminders: MutableList<ReminderDTO>? = mutableListOf()
-        reminders?.add(ReminderDTO("Reminder1", "Description1",null,null,null))
-        reminders?.add(ReminderDTO("Reminder2", "Description3",null,null,null))
         datasource = FakeDataSource()
-        //not sosure
-        datasource.addReminders(ReminderDTO("Reminder1", "Description1",null,null,null))
-
+        datasource.setReturnError(true)
         reminderListViewModel = RemindersListViewModel(ApplicationProvider.getApplicationContext(), datasource)
 
         // Given a fresh TasksViewModel
         reminderListViewModel.loadReminders()
 
         // Then the new task event is triggered
-        val value = reminderListViewModel.showLoading.getOrAwaitValue()
-        //val valueS = reminderListViewModel.showSnackBar.getOrAwaitValue()
-
-
+        val value = reminderListViewModel.showSnackBar.getOrAwaitValue()
         // Then the new task event is triggered
-        Assert.assertThat(value, Is.`is`(false))
-        //Assert.assertThat(valueS, Is.`is`(""))
+        Assert.assertThat(value, Is.`is`("Test exception"))
     }
-
 
 }

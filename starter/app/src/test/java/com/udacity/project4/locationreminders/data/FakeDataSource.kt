@@ -8,9 +8,18 @@ import java.util.LinkedHashMap
 //Use FakeDataSource that acts as a test double to the LocalDataSource
 class FakeDataSource(var reminders: MutableList<ReminderDTO>? = mutableListOf() )  : ReminderDataSource {
 
+    private var shouldReturnError = false
+
     var reminderServiceData: LinkedHashMap<String, ReminderDTO> = LinkedHashMap()
 
+    fun setReturnError(value: Boolean) {
+        shouldReturnError = value
+    }
+
     override suspend fun getReminders(): Result<List<ReminderDTO>> {
+        if (shouldReturnError) {
+            return Result.Error("Test exception", -1)
+        }
         reminders?.let { return Result.Success(ArrayList(it)) }
         return Result.Error("Tasks not found", 101)
     }
@@ -20,7 +29,7 @@ class FakeDataSource(var reminders: MutableList<ReminderDTO>? = mutableListOf() 
     }
 
     override suspend fun getReminder(id: String): Result<ReminderDTO> {
-        reminders?.let { return Result.Success(it[id.toInt()]) } //TODO MERVE yanlis olabilir
+        reminders?.let { return Result.Success(it[id.toInt()]) }
         return Result.Error("Task not found", 105)
     }
 

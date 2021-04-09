@@ -21,6 +21,7 @@ import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.core.IsNot.not
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -103,8 +104,6 @@ class ReminderListFragmentTest {
             ReminderListFragmentDirections.toSaveReminder()
         )
 
-        Thread.sleep(5000)
-
     }
 
     @Test
@@ -146,7 +145,8 @@ class ReminderListFragmentTest {
                 )
             )
         )
-        Thread.sleep(5000)
+        onView(withId(R.id.noDataTextView)).check(ViewAssertions.matches(not(ViewMatchers.isDisplayed())))
+
     }
 
     @Test
@@ -164,6 +164,5 @@ class ReminderListFragmentTest {
                 )
             )
         )
-        Thread.sleep(5000)
     }
 }
