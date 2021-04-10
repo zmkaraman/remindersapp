@@ -1,6 +1,7 @@
 package com.udacity.project4
 
 import android.app.Application
+import android.view.View
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
@@ -9,6 +10,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -23,6 +25,7 @@ import com.udacity.project4.util.DataBindingIdlingResource
 import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoIdlingResource
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.Matchers.not
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -42,6 +45,7 @@ class RemindersActivityTest :
 
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
+    private var decorView: View? = null
 
     // An Idling Resource that waits for Data Binding to have no pending bindings
     private val dataBindingIdlingResource = DataBindingIdlingResource()
@@ -156,6 +160,14 @@ class RemindersActivityTest :
         //onView(withId(R.id.selectedLocation)).perform(replaceText("NEW LOCATION"))
         onView(withId(R.id.saveReminder)).perform(click())
 
+
+        activityScenario.onActivity {
+            decorView = it.window.decorView
+        }
+
+        onView(withText("Reminder Saved !"))
+                .inRoot(withDecorView(not(decorView)))// Here we use decorView
+                .check(matches(isDisplayed()));
 
         // Verify task is displayed on screen in the task list.
         onView(withText("NEW TITLE")).check(matches(isDisplayed()))
