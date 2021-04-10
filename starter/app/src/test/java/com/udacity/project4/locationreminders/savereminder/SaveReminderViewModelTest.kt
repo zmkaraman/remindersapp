@@ -106,6 +106,7 @@ class SaveReminderViewModelTest {
 
         // Then the new task event is triggered
         val value = saveReminderViewModel.showToast.getOrAwaitValue()
+
         Assert.assertThat(value, `is`("Reminder Saved !"))
     }
 
@@ -119,8 +120,21 @@ class SaveReminderViewModelTest {
 
         // Then the new task event is triggered
         val value = saveReminderViewModel.showSnackBarInt.getOrAwaitValue()
+
         Assert.assertThat(value, `is`(R.string.err_enter_title))
     }
 
 
+    @Test
+    fun addReminderNoLocation_setsReturnsErrorMsg() {
+
+        var reminderDataItem = ReminderDataItem("Title","Descr","", null, null, "")
+        // Given a fresh TasksViewModel
+        saveReminderViewModel.validateAndSaveReminder(reminderDataItem)
+
+        // Then the new task event is triggered
+        val value = saveReminderViewModel.showSnackBarInt.getOrAwaitValue()
+
+        Assert.assertThat(value, `is`(R.string.err_select_location))
+    }
 }
