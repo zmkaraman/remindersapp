@@ -156,10 +156,51 @@ class RemindersActivityTest :
         //onView(withId(R.id.selectedLocation)).perform(replaceText("NEW LOCATION"))
         onView(withId(R.id.saveReminder)).perform(click())
 
+
         // Verify task is displayed on screen in the task list.
         onView(withText("NEW TITLE")).check(matches(isDisplayed()))
         // Verify previous task is not displayed.
         onView(withText("TITLE15")).check(doesNotExist())
+
+
+        // Make sure the activity is closed before resetting the db.
+        activityScenario.close()
+    }
+
+    @Test
+    fun saveToRemindersList_ErrSnackBar() = runBlocking {
+
+        // Set initial state.
+        repository.saveReminder(ReminderDTO("TITLE1", "DESCRIPTION", "LOCATION1", null, null))
+
+        // Start up Tasks screen.
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        // Click on the task on the list and verify that all the data is correct.
+        onView(withId(R.id.title)).check(matches(withText("TITLE1")))
+        onView(withId(R.id.description)).check(matches(withText("DESCRIPTION")))
+        onView(withId(R.id.location)).check(matches(withText("LOCATION1")))
+
+
+        // Click on the add button, edit, and save.
+        onView(withId(R.id.addReminderFAB)).perform(click())
+
+
+        // Click on the location button, edit, and save.
+        onView(withId(R.id.selectLocation)).perform(click())
+
+        //map randomclidk
+        onView(withId(R.id.map)).perform(click())
+
+        // Click on the location button, edit, and save.
+        onView(withId(R.id.save_location)).perform(click())
+
+        onView(withId(R.id.reminderDescription)).perform(replaceText("NEW DESCRIPTION"))
+        onView(withId(R.id.saveReminder)).perform(click())
+
+        onView(withId(R.id.snackbar_text))
+                .check(matches(withText(R.string.err_enter_title)))
 
 
         // Make sure the activity is closed before resetting the db.
