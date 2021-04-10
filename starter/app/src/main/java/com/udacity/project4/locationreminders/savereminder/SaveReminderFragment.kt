@@ -262,7 +262,7 @@ class SaveReminderFragment : BaseFragment() {
                     .build()
 
             context?.let {
-                if (ActivityCompat.checkSelfPermission(it, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(it, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)
                 } else {
                     Log.d(TAG, "Error Permission addGeoFencingRequest")
