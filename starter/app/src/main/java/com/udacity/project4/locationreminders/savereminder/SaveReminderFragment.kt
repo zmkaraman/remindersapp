@@ -186,7 +186,7 @@ class SaveReminderFragment : BaseFragment() {
             Snackbar.make(
                 binding.fragmentSaveReminder,
                 R.string.permission_denied_explanation,
-                Snackbar.LENGTH_INDEFINITE
+                Snackbar.LENGTH_SHORT
             )
                 .setAction(R.string.settings) {
                     startActivity(Intent().apply {
@@ -226,7 +226,7 @@ class SaveReminderFragment : BaseFragment() {
             } else {
                 Snackbar.make(
                     binding.fragmentSaveReminder,
-                    R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
+                    R.string.location_required_error, Snackbar.LENGTH_SHORT
                 ).setAction(android.R.string.ok) {
                     checkDeviceLocationSettingsAndStartGeofence()
                 }.show()
