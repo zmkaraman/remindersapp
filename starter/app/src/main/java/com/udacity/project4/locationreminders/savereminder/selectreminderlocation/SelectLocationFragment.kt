@@ -69,7 +69,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         // Create persistent LocationManager reference
         locationManager = context!!.getSystemService(LOCATION_SERVICE) as LocationManager
 
-
         val mMapFragment = SupportMapFragment.newInstance()
         val fragmentTransaction: FragmentTransaction = childFragmentManager.beginTransaction()
         fragmentTransaction.add(R.id.map, mMapFragment)
@@ -85,7 +84,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         binding.saveLocation.setOnClickListener {
 
             if (marker == null) {
-                Toast.makeText(activity, "Please select a location", Toast.LENGTH_SHORT).show()
+                _viewModel.showSnackBarInt.value = R.string.err_select_location
             } else{
                 onLocationSelected()
             }
@@ -136,11 +135,14 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         criteria.isCostAllowed = true
         val strLocationProvider = locationManager.getBestProvider(criteria, true)
 
-        val location: Location? = locationManager.getLastKnownLocation(strLocationProvider!!)
 
-        location?.let {
-            latitude = it.latitude
-            longitude = it.longitude
+        strLocationProvider?.let {
+            val location: Location? = locationManager.getLastKnownLocation(strLocationProvider)
+
+            location?.let {
+                latitude = it.latitude
+                longitude = it.longitude
+            }
         }
     }
 
@@ -167,11 +169,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 // You can use the API that requires the permission.
                 map.isMyLocationEnabled = true
             } else {
-                ActivityCompat.requestPermissions(
-                        it,
-                        arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
-                        REQUEST_LOCATION_PERMISSION
-                )
+                requestPermissions(arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
             }
         }
 
@@ -223,9 +221,15 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        Log.e(TAG, "onRequestPermissionsResult.")
+
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                Log.e(TAG, "PERMISSION_GRANTED")
                 enableMyLocation()
+            } else {
+                Log.e(TAG, "PERMISSION NOT GRANTED")
+                _viewModel.showSnackBarInt.value = R.string.location_required_error
             }
         }
     }

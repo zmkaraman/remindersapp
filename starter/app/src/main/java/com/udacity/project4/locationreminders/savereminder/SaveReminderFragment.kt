@@ -1,7 +1,6 @@
 package com.udacity.project4.locationreminders.savereminder
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.PendingIntent
 import android.content.Intent
@@ -14,12 +13,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.snackbar.Snackbar
 import com.udacity.project4.BuildConfig
 import com.udacity.project4.R
@@ -29,8 +26,6 @@ import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSaveReminderBinding
 import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver
 import com.udacity.project4.locationreminders.geofence.GeofencingConstants
-import com.udacity.project4.locationreminders.geofence.GeofencingConstants.LANDMARK_DATA
-import com.udacity.project4.locationreminders.geofence.LandmarkDataObject
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
@@ -134,13 +129,9 @@ class SaveReminderFragment : BaseFragment() {
             else -> REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
         }
         Log.d(TAG, "Request foreground only location permission")
-        activity?.let {
-            ActivityCompat.requestPermissions(
-                it,
-                permissionsArray,
-                resultCode
-            )
-        }
+        _viewModel.showSnackBarInt.value = R.string.location_required_error
+
+        requestPermissions(permissionsArray, resultCode)
     }
 
     /*
@@ -180,6 +171,7 @@ class SaveReminderFragment : BaseFragment() {
         permissions: Array<String>,
         grantResults: IntArray
     ) {
+
         Log.d(TAG, "onRequestPermissionResult")
 
         if (
@@ -189,6 +181,8 @@ class SaveReminderFragment : BaseFragment() {
                     grantResults[BACKGROUND_LOCATION_PERMISSION_INDEX] ==
                     PackageManager.PERMISSION_DENIED)
         ) {
+            Log.d(TAG, "PERMISSION_DENIED Request foreground only location permission")
+            _viewModel.showSnackBarInt.value = R.string.permission_denied_explanation
             Snackbar.make(
                 binding.fragmentSaveReminder,
                 R.string.permission_denied_explanation,
@@ -247,28 +241,37 @@ class SaveReminderFragment : BaseFragment() {
         }
     }
 
-    @SuppressLint("MissingPermission")
+    //@SuppressLint("MissingPermission")
     private fun addGeoFencingRequest(reminderDataItem: ReminderDataItem) {
 
-        val geofence = Geofence.Builder()
-            .setRequestId(reminderDataItem.id)
-            .setCircularRegion(
-                reminderDataItem.latitude!!,
-                reminderDataItem.longitude!!,
-                GeofencingConstants.GEOFENCE_RADIUS_IN_METERS
-            )
-            .setExpirationDuration(GeofencingConstants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-            .build()
+        if (reminderDataItem.latitude != null && reminderDataItem.longitude != null) {
+            val geofence = Geofence.Builder()
+                    .setRequestId(reminderDataItem.id)
+                    .setCircularRegion(
+                            reminderDataItem.latitude!!,
+                            reminderDataItem.longitude!!,
+                            GeofencingConstants.GEOFENCE_RADIUS_IN_METERS
+                    )
+                    .setExpirationDuration(GeofencingConstants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                    .build()
 
-        val geofencingRequest = GeofencingRequest.Builder()
-            .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-            .addGeofence(geofence)
-            .build()
+            val geofencingRequest = GeofencingRequest.Builder()
+                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                    .addGeofence(geofence)
+                    .build()
 
-        geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)
-
-
+            context?.let {
+                if (ActivityCompat.checkSelfPermission(it, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)
+                } else {
+                    Log.d(TAG, "Error Permission addGeoFencingRequest")
+                    _viewModel.showSnackBarInt.value = R.string.error_adding_geofence
+                }
+            }
+        } else {
+            _viewModel.showSnackBarInt.value = R.string.error_adding_geofence
+        }
     }
 
     override fun onDestroy() {

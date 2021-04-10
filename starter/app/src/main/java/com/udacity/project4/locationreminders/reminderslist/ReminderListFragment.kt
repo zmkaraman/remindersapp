@@ -73,11 +73,7 @@ class ReminderListFragment : BaseFragment() {
         when (item.itemId) {
             R.id.logout -> {
                 AuthUI.getInstance().signOut(requireContext())
-                _viewModel.navigationCommand.postValue(
-                        NavigationCommand.To(
-                                ReminderListFragmentDirections.toMain()
-                        )
-                )
+                activity?.finish()
             }
         }
         return super.onOptionsItemSelected(item)
