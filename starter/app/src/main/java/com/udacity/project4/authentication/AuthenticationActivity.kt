@@ -28,9 +28,6 @@ class AuthenticationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authentication)
-
-        Toast.makeText(this, "AuthenticationActivity", Toast.LENGTH_SHORT).show()
-
     }
 
     companion object {

@@ -59,16 +59,10 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
                     return
                 }
             }
-
-            //TODO MERVE pendingIntentten alınmali
-            var reminderDataItem: ReminderDataItem = ReminderDataItem("Hey","Merve evin burası",
-                "Location",37.808674,-122.409821)
-            //notificationManager.sendNotification(mContext, reminderDataItem)
             sendNotification(geofencingEvent.triggeringGeofences)
         }
     }
 
-    //TODO: get the request id of the current geofence
     private fun sendNotification(triggeringGeofences: List<Geofence>) {
         val requestId = triggeringGeofences[0].requestId
 

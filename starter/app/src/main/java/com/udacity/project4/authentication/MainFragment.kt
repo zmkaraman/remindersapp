@@ -90,11 +90,7 @@ class MainFragment : Fragment() {
                     findNavController().navigate(action)
                 }
                 else -> {
-                    // TODO 3. Lastly, if there is no logged-in user,
-                    // auth_button should display Login and
-                    //  launch the sign in screen when clicked.
-                    //binding.authButton.text = getString(R.string.login)
-                    //binding.authButton.setOnClickListener { launchSignInFlow() }
+                    // DO NOTHING
                 }
             }
         })

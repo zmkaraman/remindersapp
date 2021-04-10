@@ -35,7 +35,6 @@ class ReminderDescriptionActivity : AppCompatActivity() {
         )
 
         binding.reminderDataItem = intent.getSerializableExtra(EXTRA_ReminderDataItem) as ReminderDataItem
-        Toast.makeText(this, "ReminderDescriptionActivity", Toast.LENGTH_SHORT).show()
 
     }
 }

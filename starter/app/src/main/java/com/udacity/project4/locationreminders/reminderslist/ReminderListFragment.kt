@@ -74,8 +74,6 @@ class ReminderListFragment : BaseFragment() {
             R.id.logout -> {
                 AuthUI.getInstance().signOut(requireContext())
                 _viewModel.navigationCommand.postValue(
-                       // NavigationCommand.BackTo(R.id.mainFragment)
-                        //TODO MERVE burasi 3. clickte calisiyor
                         NavigationCommand.To(
                                 ReminderListFragmentDirections.toMain()
                         )

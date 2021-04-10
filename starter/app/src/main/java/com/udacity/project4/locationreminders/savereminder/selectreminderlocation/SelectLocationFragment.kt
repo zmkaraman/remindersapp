@@ -2,8 +2,13 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context.LOCATION_SERVICE
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.location.Criteria
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -16,7 +21,10 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
@@ -34,6 +42,12 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var map: GoogleMap
     private lateinit var latLang: LatLng
 
+    //These coordinates represent the latitude and longitude of the Googleplex.
+    private var latitude =  37.422160 // default values
+    private var longitude = -122.084270
+    val zoomLevel = 15f
+
+    private lateinit var locationManager: LocationManager
 
     //Use Koin to get the view model of the SaveReminder
     override val _viewModel: SaveReminderViewModel by inject()
@@ -52,7 +66,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
 
-        //TODO MERVE not so sure
+        // Create persistent LocationManager reference
+        locationManager = context!!.getSystemService(LOCATION_SERVICE) as LocationManager
+
+
         val mMapFragment = SupportMapFragment.newInstance()
         val fragmentTransaction: FragmentTransaction = childFragmentManager.beginTransaction()
         fragmentTransaction.add(R.id.map, mMapFragment)
@@ -73,6 +90,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 onLocationSelected()
             }
         }
+
+        getLocation()
     }
 
     private fun onLocationSelected() {
@@ -107,15 +126,26 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         else -> super.onOptionsItemSelected(item)
     }
 
+    @SuppressLint("MissingPermission")
+    private fun getLocation() {
+
+        val criteria = Criteria()
+        criteria.accuracy = Criteria.ACCURACY_FINE
+        criteria.isAltitudeRequired = false
+        criteria.isBearingRequired = false
+        criteria.isCostAllowed = true
+        val strLocationProvider = locationManager.getBestProvider(criteria, true)
+
+        val location: Location? = locationManager.getLastKnownLocation(strLocationProvider!!)
+
+        location?.let {
+            latitude = it.latitude
+            longitude = it.longitude
+        }
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-
-        //These coordinates represent the latitude and longitude of the Googleplex.
-        //TODO Merve vakit kalırsa user location
-        val latitude = 37.422160
-        val longitude = -122.084270
-
-        val zoomLevel = 15f
 
         val homeLatLng = LatLng(latitude, longitude)
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(homeLatLng, zoomLevel))
